@@ -16,13 +16,13 @@ type Input struct {
 
 func inputs() []Input {
 	data := []Input{
-		// {100_000, 100_000, 2},
-		// {500_000, 500_000, 2},
-		// {1_000_000, 1_000_000, 2},
+		{100_000, 100_000, 2},
+		{500_000, 500_000, 2},
+		{1_000_000, 1_000_000, 2},
 		{7_648_002, 7_648_002, 2},
-		{14_018_002, 14_018_002, 2},
-		{20_388_002, 20_388_002, 2},
-		{21_964_002, 21_964_002, 2},
+		// {14_018_002, 14_018_002, 2},
+		// {20_388_002, 20_388_002, 2},
+		// {21_964_002, 21_964_002, 2},
 	}
 	return data
 }
@@ -31,9 +31,9 @@ func BenchmarkGroth16(b *testing.B) {
 
 	testcases := inputs()
 	for i := 0; i < len(testcases); i++ {
-		aCount := testcases[i].constraintsCount
-		bCount := testcases[i].numVars + testcases[i].statementSize
-		// cCount := testcases[i].constraintsCount - testcases[i].statementSize
+		aCount := testcases[i].numVars
+		bCount := testcases[i].constraintsCount + testcases[i].statementSize
+		// cCount := testcases[i].numVars - testcases[i].statementSize
 		maxCount := max(aCount, bCount)
 
 		baseG1 := generateG1(maxCount)
