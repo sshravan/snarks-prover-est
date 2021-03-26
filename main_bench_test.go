@@ -93,6 +93,64 @@ func BenchmarkExponentiation(b *testing.B) {
 	}
 }
 
+func BenchmarkPairing(b *testing.B) {
+
+	var size []uint64
+	size = []uint64{10_000}
+	for i := 0; i < len(size); i++ {
+		baseG1 := generateG1(size[i])
+		baseG2 := generateG2(size[i])
+		baseGT := generateGT(size[i])
+		fmt.Println("Done generating the data")
+
+		b.Run(fmt.Sprintf("%d/GTMul;", size[i]), func(t *testing.B) {
+			var result mcl.GT
+			result.SetString("1", 10)
+			t.ResetTimer()
+			for i := 0; i < t.N; i++ {
+				for j := 0; j < len(baseG1); j++ {
+					mcl.GTMul(&result, &result, &baseGT[j])
+				}
+			}
+		})
+
+		b.Run(fmt.Sprintf("%d/MillerLoop;", size[i]), func(t *testing.B) {
+			t.ResetTimer()
+			for i := 0; i < t.N; i++ {
+				for j := 0; j < len(baseG1); j++ {
+					mcl.MillerLoop(&baseGT[j], &baseG1[j], &baseG2[j])
+				}
+			}
+		})
+
+		b.Run(fmt.Sprintf("%d/FinalExp;", size[i]), func(t *testing.B) {
+			t.ResetTimer()
+			for i := 0; i < t.N; i++ {
+				for j := 0; j < len(baseG1); j++ {
+					mcl.FinalExp(&baseGT[j], &baseGT[j])
+				}
+			}
+		})
+
+		b.Run(fmt.Sprintf("%d/NaivePairing;", size[i]), func(t *testing.B) {
+			t.ResetTimer()
+			for i := 0; i < t.N; i++ {
+				for j := 0; j < len(baseG1); j++ {
+					mcl.Pairing(&baseGT[j], &baseG1[j], &baseG2[j])
+				}
+			}
+		})
+
+		b.Run(fmt.Sprintf("%d/MillerLoopVec;", size[i]), func(t *testing.B) {
+			var result mcl.GT
+			t.ResetTimer()
+			for i := 0; i < t.N; i++ {
+				mcl.MillerLoopVec(&result, baseG1, baseG2)
+			}
+		})
+	}
+}
+
 func BenchmarkGroth16(b *testing.B) {
 
 	testcases := inputs()

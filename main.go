@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math"
+	"math/rand"
 
 	"github.com/alinush/go-mcl"
 )
@@ -26,6 +28,17 @@ func generateFr(count uint64) []mcl.Fr {
 	base := make([]mcl.Fr, count)
 	for i := uint64(0); i < count; i++ {
 		base[i].Random()
+	}
+	return base
+}
+
+func generateGT(count uint64) []mcl.GT {
+	N := int64(math.MaxInt64)
+	var v int64
+	base := make([]mcl.GT, count)
+	for i := uint64(0); i < count; i++ {
+		v = rand.Int63n(N)
+		base[i].SetInt64(v)
 	}
 	return base
 }
